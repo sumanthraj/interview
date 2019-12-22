@@ -1,10 +1,13 @@
+// Dictionary for both geojson files 
 let jsonDataUrls = {
     'Neighborhoods': 'https://raw.githubusercontent.com/sumanthraj/interview/master/assets/kc-neighborhoods.json',
     'Tracts': 'https://raw.githubusercontent.com/sumanthraj/interview/master/assets/kc-tracts.json'
 };
 
+//initial loading of the visualization
 loadMap(jsonDataUrls['Neighborhoods']);
 
+//dropdown for selecting the json data
 let dropdown = $('#layer');
 $.each(jsonDataUrls, function (val, text) {
     dropdown.append(
@@ -20,11 +23,12 @@ $("#layer").change(function () {
 
 });
 
+//function to load the selected json from dropdown
 function loadMap(url){
 
     d3.json(url).then(mapDraw);
 
-
+    //drawing the data on the map
     function mapDraw(geojson) {
 
         mapboxgl.accessToken = 'pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kztmsfIPxa9MQ'
@@ -45,6 +49,8 @@ function loadMap(url){
 
         var container = map.getCanvasContainer()
         var svg = d3.select(container).append("svg")
+        
+        //legend for the data of different types of commute 
         svg.append("circle").attr("cx",1100).attr("cy",500).attr("r", 6).style("fill", "#1A237E")
         svg.append("circle").attr("cx",1100).attr("cy",515).attr("r", 6).style("fill", "#FF5733")
         svg.append("circle").attr("cx",1100).attr("cy",530).attr("r", 6).style("fill", "#FFC300")
@@ -58,6 +64,7 @@ function loadMap(url){
         var transform = d3.geoTransform({ point: projectPoint });
         var path = d3.geoPath().projection(transform);
 
+
         var colors = {
             'drive-alone' : '#1A237E',
             'drive-carpool' : '#FF5733',
@@ -65,18 +72,18 @@ function loadMap(url){
             'walk' : '#B71C1C'
 
         };
-            
+        //generating svg path instructions from geojson data
         var featureElement = svg.selectAll("path")
             .data(geojson.features)
             .enter()
             .append("path")
-            .on("mouseover", function (d) {
+            .on("mouseover", function (d) {  // producing tooltip data for a particular area when on mouse 
 
                 let props = d.properties
                 let details = (props.shid).split("/");
                 let title_type = details[details.length - 1];
                 let title = title_type.split(":")[1];
-
+                // Calulating percentage for the people who walk and take vehicles for commute
                 let drive_alone = roundOff(props['pop-commute-drive_alone'], 1);
                 let carpool = roundOff(props['pop-commute-drive_carpool'], 1);
                 let public_transit = roundOff(props['pop-commute-public_transit'], 1);
@@ -113,7 +120,7 @@ function loadMap(url){
                     .duration(500)
                     .style("opacity", 0);
             })
-            .attr("fill", function (d) {
+            .attr("fill", function (d) { // filling the area of the map with a color respective to the maximum number of commute type
                 let props = d.properties;
 
                 let map =  new Map();
@@ -159,6 +166,7 @@ function loadMap(url){
             this.stream.point(point.x, point.y);
         }
 
+        // function for the data to round off to decimal points and if its zero displaying 0 rather than NaN
         function roundOff(val, total) {
             return (total > 0) ? Math.floor((val / total) * 10000) / 100 : 0;
         }
