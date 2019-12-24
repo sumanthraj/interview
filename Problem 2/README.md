@@ -14,3 +14,4 @@
 * When neighborhood data is selected the data regarding the commute of the people in the kansas city are mapped. 
 * The area where the maximum of people commute by a particular type of commute then area is filled with the corresponding color as shown on the legend at the bottom right corner.
 * For example harlem area in the neighborhood data is mostly filled with orange because the people in that area are commuting mostly through carpool.
+* You can view the visualization here : https://sumanthraj.github.io/
